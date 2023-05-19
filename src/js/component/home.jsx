@@ -1,6 +1,10 @@
 import React, { useState, useEffect} from "react";
 
 const Home = () => {
+
+	const [data, setData] = useState("");
+	const [todo, setTodo] = useState([]);
+  
 	
 	useEffect (() => {
 
@@ -28,8 +32,6 @@ const Home = () => {
 });
 
 
-  const [data, setData] = useState("");
-  const [todo, setTodo] = useState([]);
 
   const handleChange = (event) => {
     setData(event.target.value);
