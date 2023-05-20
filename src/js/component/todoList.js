@@ -1,6 +1,6 @@
 import React, { useState, } from "react";
 
-const Home = () => {
+const TodoList = () => {
 
 	const [data, setData] = useState("");
 	const [todo, setTodo] = useState([]);
@@ -12,7 +12,6 @@ const Home = () => {
 
   const addTodo = () => {
     setTodo([...todo, { data }]);
-
   };
 
   return (
@@ -28,4 +27,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default TodoList;
