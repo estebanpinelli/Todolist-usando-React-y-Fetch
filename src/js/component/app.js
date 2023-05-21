@@ -1,59 +1,85 @@
 import React, { useState, useEffect } from "react";
-import TodoList from "./todoList";
 
 const App = () => {
 
-    const [data, setData] = useState("Escriba");
-
-    // todo list del cliente.
+    const [data, setData] = useState("");
     const [todo, setTodo] = useState([]);
 
-    useEffect(() => {
-        // todo list del servidor >>
-        fetch('https://assets.breatheco.de/apis/fake/todos/user/Pablofernandez', {
-          method: "GET",
-          headers: {
+    useEffect(() => { 
+      fetch("https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli", {
+        method: "HEAD",
+      })
+        .then((resp) => {
+          if (!resp.ok) {
+            return fetch(
+              "https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(todo),
+              }
+              
+            )   .then(() => {
+
+              window.location.reload();
+            });;
+            
+          } else {
+            return fetch(
+              "https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli"
+            );
           }
         })
-        .then(resp => {
-          console.log(resp.ok);
-          return resp.json();
+        .then((resp) => resp.json())
+        .then((todo) => {
+
+          setTodo(todo);
         })
-        .then(data => {
-          console.log(data);
-          setTodo(data) // seteando todo list del cliente con la del servidor.
-        })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
-      }, []);
+    }, []);
     
-      // solo mantiene en 'data' lo que hay en el input text
+
     const handleChange = (event) => {
       setData(event.target.value);
     };
   
     const addTodo = () => {
-      let tod = [...todo, { label:data, done: false }] // no está ni en el cliente ni en el servidor.
-      setTodo(tod); // setea la nueva en el cliente.
-      saveTodo(tod); // setea en el servidor.
+      let task = [...todo, { label:data, done: false }] 
+      setTodo(task);
+      setData("") 
     };
   
-    const saveTodo =(tod) => {
-      /// setear en el servidor el valor de `tod` 
-      fetch('https://assets.breatheco.de/apis/fake/todos/user/Pablofernandez', {
+    const saveTodo =() => {
+      fetch('https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli', {
         method: "PUT",
-        body: JSON.stringify(tod),
+        body: JSON.stringify(todo),
         headers: {
           "Content-Type": "application/json"
         }
       })
     }
 
+    const deleteTodo =() => {
+      fetch('https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli', {
+        method: "DELETE",
+        body: JSON.stringify(todo),
+        headers: {
+          "Content-Type": "application/json"
+        }
+   })   .then(resp => {
+    console.log(resp.ok); })
+    }
+
     return (
       <>
         <input type="text" name="text" value={data} onChange={handleChange} />
         <button onClick={addTodo}>Add Todo</button>
+        <button onClick={saveTodo}>Save Todo</button>
+        <button onClick={deleteTodo}>Delete Todo</button>
         <ul>
           {todo.map((todoItem, index) => {
             return <li key={index}>{todoItem.label}</li>;
