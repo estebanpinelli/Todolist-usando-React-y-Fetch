@@ -48,20 +48,19 @@ const App = () => {
     };
   
     const addTodo = () => {
-      let task = [...todo, { label:data, done: false }] 
-      setTodo(task);
-      setData("") 
-    };
-  
-    const saveTodo =() => {
-      fetch('https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli', {
-        method: "PUT",
-        body: JSON.stringify(todo),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-    }
+
+        let task = [...todo, { label: data, done: false }];
+        setTodo(task);
+        setData("");
+        
+        fetch('https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli', {
+          method: "PUT",
+          body: JSON.stringify(task),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+      };
 
     const deleteTodo =() => {
       fetch('https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli', {
@@ -75,18 +74,25 @@ const App = () => {
     }
 
     return (
-      <>
+      <div className="col-6 text-center  " >
+       <div className="m-3" >
+       <h1>To Do List</h1>
         <input type="text" name="text" value={data} onChange={handleChange} />
-        <button onClick={addTodo}>Add Todo</button>
-        <button onClick={saveTodo}>Save Todo</button>
-        <button onClick={deleteTodo}>Delete Todo</button>
+        <button onClick={addTodo}><i className="far fa-save"></i></button>
+        <button onClick={deleteTodo}><i className="fas fa-trash-alt"></i></button>
+        </div>
         <ul>
-          {todo.map((todoItem, index) => {
-            return <li key={index}>{todoItem.label}</li>;
-          })}
+          {todo.map((todoItem, index) => (
+            <div className="form-check text-start border-bottom border-3  " key={index}>
+              <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
+              <label className="form-check-label" htmlFor="flexCheckDefault">
+                <h4>{todoItem.label}</h4>
+              </label>
+            </div>
+          ))}
         </ul>
-      </>
-    );
-  };
+      </div>
+    )}
+
       
 export default App;
