@@ -1,98 +1,76 @@
 import React, { useState, useEffect } from "react";
 
 const App = () => {
+  const [data, setData] = useState("");
+  const [todo, setTodo] = useState([]);
 
-    const [data, setData] = useState("");
-    const [todo, setTodo] = useState([]);
-
-    useEffect(() => { 
-      fetch("https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli", {
-        method: "HEAD",
+  useEffect(() => {
+    fetch("https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli")
+      .then((resp) => resp.json())
+      .then((todo) => {
+        setTodo(todo);
       })
-        .then((resp) => {
-          if (!resp.ok) {
-            return fetch(
-              "https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(todo),
-              }
-              
-            )   .then(() => {
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
-              window.location.reload();
-            });;
-            
-          } else {
-            return fetch(
-              "https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli"
-            );
-          }
-        })
-        .then((resp) => resp.json())
-        .then((todo) => {
+  const handleChange = (event) => {
+    setData(event.target.value);
+  };
 
-          setTodo(todo);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }, []);
-    
+  const addTodo = () => {
+    const nuevaTarea = { label: data, done: false };
+    setTodo([...todo, nuevaTarea]);
+    setData("");
 
-    const handleChange = (event) => {
-      setData(event.target.value);
-    };
-  
-    const addTodo = () => {
+    // Guardar la nueva lista de tareas en la API
+    fetch("https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli", {
+      method: "PUT",
+      body: JSON.stringify([...todo, nuevaTarea]),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  };
 
-        let task = [...todo, { label: data, done: false }];
-        setTodo(task);
-        setData("");
-        
-        fetch('https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli', {
-          method: "PUT",
-          body: JSON.stringify(task),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
-      };
+  const deleteTodo = (index) => {
+    const listaActualizada = [...todo];
+    listaActualizada.splice(index, 1);
+    setTodo(listaActualizada);
 
-    const deleteTodo =() => {
-      fetch('https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli', {
-        method: "DELETE",
-        body: JSON.stringify(todo),
-        headers: {
-          "Content-Type": "application/json"
-        }
-   })   .then(resp => {
-    console.log(resp.ok); })
-    }
+    // Guardar la lista de tareas actualizada en la API
+    fetch("https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli", {
+      method: "PUT",
+      body: JSON.stringify(listaActualizada),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  };
 
-    return (
-      <div className="col-6 text-center  " >
-       <div className="m-3" >
-       <h1>To Do List</h1>
+  return (
+    <div className="col-6 text-center">
+      <div className="m-3">
+        <h1>Lista de Tareas</h1>
         <input type="text" name="text" value={data} onChange={handleChange} />
-        <button onClick={addTodo}><i className="far fa-save"></i></button>
-        <button onClick={deleteTodo}><i className="fas fa-trash-alt"></i></button>
-        </div>
-        <ul>
-          {todo.map((todoItem, index) => (
-            <div className="form-check text-start border-bottom border-3  " key={index}>
-              <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
-              <label className="form-check-label" htmlFor="flexCheckDefault">
-                <h4>{todoItem.label}</h4>
-              </label>
-            </div>
-          ))}
-        </ul>
+        <button onClick={addTodo}>
+          <i className="far fa-save"></i>
+        </button>
       </div>
-    )}
+      <ul>
+        {todo.map((tarea, index) => (
+          <div className="form-check text-start border-bottom border-3" key={index}>
+            <input className="form-check-input" type="checkbox" value="" id={`checkbox-${index}`} />
+            <label className="form-check-label" htmlFor={`checkbox-${index}`}>
+              <h4>{tarea.label}</h4>
+            </label>
+            <button onClick={() => deleteTodo(index)}>Eliminar</button>
+          </div>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
-      
 export default App;
