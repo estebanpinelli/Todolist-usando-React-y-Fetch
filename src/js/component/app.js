@@ -5,14 +5,11 @@ const App = () => {
   const [todo, setTodo] = useState([]);
 
   useEffect(() => {
-    fetch("https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli")
-      .then((resp) => resp.json())
-      .then((todo) => {
-        setTodo(todo);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    // Cargar la lista de tareas almacenada en LocalStorage al cargar la página
+    const savedTodo = localStorage.getItem("todo");
+    if (savedTodo) {
+      setTodo(JSON.parse(savedTodo));
+    }
   }, []);
 
   const handleChange = (event) => {
@@ -24,10 +21,12 @@ const App = () => {
     setTodo([...todo, nuevaTarea]);
     setData("");
 
-    // Guardar la nueva lista de tareas en la API
+    // Guardar la nueva lista de tareas en LocalStorage y en la API
+    const updatedTodo = [...todo, nuevaTarea];
+    localStorage.setItem("todo", JSON.stringify(updatedTodo));
     fetch("https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli", {
       method: "PUT",
-      body: JSON.stringify([...todo, nuevaTarea]),
+      body: JSON.stringify(updatedTodo),
       headers: {
         "Content-Type": "application/json",
       },
@@ -39,7 +38,8 @@ const App = () => {
     listaActualizada.splice(index, 1);
     setTodo(listaActualizada);
 
-    // Guardar la lista de tareas actualizada en la API
+    // Guardar la lista de tareas actualizada en LocalStorage y en la API
+    localStorage.setItem("todo", JSON.stringify(listaActualizada));
     fetch("https://assets.breatheco.de/apis/fake/todos/user/estebanpinelli", {
       method: "PUT",
       body: JSON.stringify(listaActualizada),
